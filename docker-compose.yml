@@ -1,0 +1,117 @@
+version: '3.6'
+services:
+
+  # bind:
+  #   restart: always
+  #   container_name: "bind"
+  #   image: sameersbn/bind:latest
+  #   ports:
+  #   - "53:53/udp"
+  #   - "53:53/tcp"
+  #   - "10000:10000/tcp"
+  #   volumes:
+  #   - /srv/docker/bind:/data
+
+  # geodns:
+  #   restart: always
+  #   container_name: "geodns"
+  #   image: maclof/geodns:latest
+  #   ports:
+  #   - "53:53"
+  #   - "53:53/udp"
+  #   volumes:
+  #   - ./dns/:/dns/
+
+  nginx-app-main:
+    build: ./app-main
+    container_name: "app-main"
+    restart: always
+    volumes:
+    - ./app-main/nginx.conf:/config/nginx.conf
+    depends_on:
+    - nginx-app1
+    - nginx-app2
+    - nginx-app3
+    - nginx-app4
+    - nginx-app5
+    - loadbalancer1
+    - loadbalancer2
+    ports:
+    - "90:80"
+
+  nginx-app1:
+    image: nginx:latest
+    container_name: "app1"
+    restart: always
+    volumes:
+    - ./app1/nginx.conf:/etc/nginx/nginx.conf
+    - ./var/www:/www
+    ports:
+    - "81:80"
+
+  nginx-app2:
+    image: nginx:latest
+    container_name: "app2"
+    restart: always
+    volumes:
+    - ./app2/nginx.conf:/etc/nginx/nginx.conf
+    - ./var/www:/www
+    ports:
+    - "82:80"
+
+  nginx-app3:
+    container_name: "app3"
+    image: nginx:latest
+    restart: always
+    volumes:
+    - ./app3/nginx.conf:/etc/nginx/nginx.conf
+    - ./var/www:/www
+    ports:
+    - "83:80"
+
+  nginx-app4:
+    container_name: "app4"
+    image: nginx:latest
+    restart: always
+    volumes:
+    - ./app4/nginx.conf:/etc/nginx/nginx.conf
+    - ./var/www:/www
+    ports:
+    - "84:80"
+
+  nginx-app5:
+    container_name: "app5"
+    image: nginx:latest
+    restart: always
+    volumes:
+    - ./app5/nginx.conf:/etc/nginx/nginx.conf
+    - ./var/www:/www
+    ports:
+    - "85:80"
+  
+  loadbalancer1:
+    container_name: "loadbalancer1"
+    image: nginx:latest
+    restart: always
+    volumes:
+    - ./loadbalancer1/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - nginx-app1
+      - nginx-app2
+      - nginx-app3
+    ports:
+      - "800:80"
+
+  loadbalancer2:
+    container_name: "loadbalancer2"
+    image: nginx:latest
+    restart: always
+    volumes:
+    - ./loadbalancer2/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - nginx-app4
+      - nginx-app5
+    ports:
+      - "900:80"
+
+
